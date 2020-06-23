@@ -6,8 +6,7 @@ dependencies:
   - python==3.7.2
   - xarray==0.15.0
   - pandas==1.0.5
-  - numpy==1.19.0
+  - numpy==1.18.1
   - matplotlib==3.2.1
   - dask==2.19.0
   - echopype==0.3.2
-  - beautifulsoup4==4.9.1
