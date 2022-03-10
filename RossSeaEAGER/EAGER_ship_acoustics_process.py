@@ -2,7 +2,7 @@
 
 """
 Author: Lori Garzio on 6/22/2020
-Last modified: 6/16/2021
+Last modified: 3/10/2022
 Convert raw echo sounder files to netCDF using echopype
 """
 
@@ -33,7 +33,7 @@ def main(rdir, model):
         # ds_Sv = calibrated Sv dataset
         # range_meter_bin = bin size to average along range in meters
         # ping_time_bin = bin size to average along ping_time in seconds
-        ds_MVBS = ep.preprocess.compute_MVBS(ds_Sv, range_meter_bin=20, ping_time_bin='20S')
+        ds_MVBS = ep.preprocess.compute_MVBS(ds_Sv, range_meter_bin=5, ping_time_bin='20S')
 
         # remove noise
         # ds_Sv = calibrated Sv dataset
@@ -50,6 +50,6 @@ def main(rdir, model):
 
 
 if __name__ == '__main__':
-    raw_dir = '/Users/garzio/Documents/rucool/Saba/Ross_Sea/Ross_Sea_EAGER_ship_acoustic_data/LegI/GrazingExpt_rep1/raw_files'
+    raw_dir = '/Users/garzio/Documents/rucool/Saba/Ross_Sea/Ross_Sea_EAGER_ship_acoustic_data/LegI/GrazingExpt_rep2/raw_files'
     sonar_model = 'EK60'  # EK60  EK80
     main(raw_dir, sonar_model)
