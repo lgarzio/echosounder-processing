@@ -12,16 +12,18 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 
-def plot_mvbs(data, save_file, max_depth=None):
+def plot_mvbs(data, depth, save_file, max_depth=None):
     data = data.swap_dims({'range_bin': 'depth'})
     # create an index where depth is < 200
     if max_depth is not None:
-        depth_ind = data.depth.values <= max_depth
-        depth = data.depth.values[depth_ind]
+        # depth_ind = data.depth.values <= max_depth
+        depth_ind = depth <= max_depth
+        # depth = data.depth.values[depth_ind]
+        depth = depth[depth_ind]
         plt_data = data.values.T[depth_ind]
         sfile = '{}_{}m'.format(save_file, str(max_depth))
     else:
-        depth = data.depth.values
+        # depth = data.depth.values
         plt_data = data.values.T
         sfile = save_file
 
@@ -32,7 +34,7 @@ def plot_mvbs(data, save_file, max_depth=None):
     cb.set_label(label='MVBS')
 
     ax.set_ylabel('Depth (m)')
-    ax.set_title('{} kHz'.format(int(data.frequency.values / 1000)))
+    ax.set_title('{}: {} kHz'.format(os.path.dirname(save_file).split('/')[-1], int(data.frequency.values / 1000)))
     ax.invert_yaxis()
 
     # format the date axis
@@ -45,23 +47,28 @@ def plot_mvbs(data, save_file, max_depth=None):
 
 
 def main(save_dir):
+    # open all of the Sv.nc files as one dataset
+    # sv_data = xr.open_mfdataset(os.path.join(save_dir, 'processed', '*_Sv.nc'),
+    #                             combine='by_coords', data_vars='different')
+
     # open all of the MVBS.nc files as one dataset
-    mvbs_data = xr.open_mfdataset(os.path.join(save_dir, 'processed', '*MVBS.nc'),
+    mvbs_data = xr.open_mfdataset(os.path.join(save_dir, 'processed', 'ds_MVBS*.nc'),
                                   combine='by_coords', data_vars='different')
 
     # add depth as a new coordinate
-    depth = mvbs_data.range_bin * mvbs_data.MVBS_range_bin_size
-    mvbs_data.coords['depth'] = (['range_bin', 'frequency'], depth)
+    mvbs_depth = mvbs_data.range_bin * mvbs_data.MVBS_range_bin_size
+    # mvbs_data.coords['depth'] = (['range_bin', 'frequency'], depth)
 
     for freq in mvbs_data.frequency:
         mvbs_data_freq = mvbs_data.MVBS.sel(frequency=freq.values)
+        mvbs_depth_freq = mvbs_depth.sel(frequency=freq.values)
         sfile = 'EAGER_{}_MVBS_{}khz'.format(os.path.basename(save_dir), int(freq.values/1000))
         sfile_path = os.path.join(save_dir, sfile)
 
-        plot_mvbs(mvbs_data_freq, sfile_path, 600)
-        plot_mvbs(mvbs_data_freq, sfile_path, 200)
+        plot_mvbs(mvbs_data_freq, mvbs_depth_freq.values, sfile_path, 600)
+        plot_mvbs(mvbs_data_freq, mvbs_depth_freq.values, sfile_path, 200)
 
 
 if __name__ == '__main__':
-    fdir = '/Users/lgarzio/Documents/rucool/Saba/Ross_Sea/Ross_Sea_EAGER_ship_acoustic_data/LegI/GrazingExpt_rep1'
+    fdir = '/Users/garzio/Documents/rucool/Saba/Ross_Sea/Ross_Sea_EAGER_ship_acoustic_data/LegI/GrazingExpt_rep1'
     main(fdir)
