@@ -59,7 +59,7 @@ def plot_sv(data, save_file, max_depth=None, title=None, trawl_times=None):
 def main(save_dir, expt):
     # open all of the Sv.nc files as one dataset
     sv_data = xr.open_mfdataset(os.path.join(save_dir, 'processed', 'ds_Sv*.nc'),
-                                combine='by_coords', data_vars='different')
+                                combine='by_coords', data_vars='different', chunks=100)
 
     # sv_data_clean = ep.preprocess.remove_noise(sv_data, range_bin_num=30, ping_num=5)
 
